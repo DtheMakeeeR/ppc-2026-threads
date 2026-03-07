@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../include/radix_sort.hpp"
+#include "../include/radix_sort_omp.hpp"
 #include "golovanov_d_radix_merge/common/include/common.hpp"
 
 namespace golovanov_d_radix_merge {
@@ -23,7 +23,7 @@ bool GolovanovDRadixMergeOMP::PreProcessingImpl() {
 
 bool GolovanovDRadixMergeOMP::RunImpl() {
   std::vector<double> input = GetInput();
-  RadixSort::Sort(input);
+  RadixSortOMP::Sort(input);
   GetOutput() = input;
   return true;
 }

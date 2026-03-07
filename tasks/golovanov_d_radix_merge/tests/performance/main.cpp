@@ -43,8 +43,8 @@ TEST_P(GolovanovDRunPerfTestsThreads, RadixMergePerf) {
 
 namespace {
 
-const auto kAllPerfTasks =
-    ppc::util::MakeAllPerfTasks<InType, GolovanovDRadixMergeSEQ, GolovanovDRadixMergeOMP>(PPC_SETTINGS_golovanov_d_radix_merge);
+const auto kAllPerfTasks = ppc::util::MakeAllPerfTasks<InType, GolovanovDRadixMergeSEQ, GolovanovDRadixMergeOMP>(
+    PPC_SETTINGS_golovanov_d_radix_merge);
 
 const auto kGtestValues = ppc::util::TupleToGTestValues(kAllPerfTasks);
 

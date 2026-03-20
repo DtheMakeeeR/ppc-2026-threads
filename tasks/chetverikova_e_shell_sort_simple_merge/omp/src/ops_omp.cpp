@@ -2,10 +2,10 @@
 
 #include <omp.h>
 
-#include <utility>
 #include <algorithm>
 #include <cstddef>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 #include "chetverikova_e_shell_sort_simple_merge/common/include/common.hpp"

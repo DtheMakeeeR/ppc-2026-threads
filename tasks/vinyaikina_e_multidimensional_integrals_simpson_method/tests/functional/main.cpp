@@ -85,10 +85,6 @@ namespace vinyaikina_e_multidimensional_integrals_simpson_method {
       return std::sin(b) - std::sin(a);
     }
 
-    double int_sin_sin_2d(double a1, double b1, double a2, double b2) {
-      return int_sin_1d(a1, b1) * int_sin_1d(a2, b2);
-    }
-
     double int_xy_2d(double a1, double b1, double a2, double b2) {
       return ((b1 * b1 - a1 * a1) * (b2 * b2 - a2 * a2)) / 4.0;
     }
@@ -100,14 +96,6 @@ namespace vinyaikina_e_multidimensional_integrals_simpson_method {
 
     double int_x2_y_2d(double a1, double b1, double a2, double b2) {
       return int_x2_1d(a1, b1) * int_linear_1d(a2, b2);
-    }
-
-    double int_exp_sum_2d(double a1, double b1, double a2, double b2) {
-      return int_exp_1d(a1, b1) * int_exp_1d(a2, b2);
-    }
-
-    double int_cos_cos_2d(double a1, double b1, double a2, double b2) {
-      return int_cos_1d(a1, b1) * int_cos_1d(a2, b2);
     }
 
     double int_xyz_3d(double a1, double b1, double a2, double b2, double a3, double b3) {
@@ -122,10 +110,6 @@ namespace vinyaikina_e_multidimensional_integrals_simpson_method {
       return int_exp_1d(a1, b1) * int_exp_1d(a2, b2) * int_exp_1d(a3, b3);
     }
 
-    double int_cos_cos_cos_3d(double a1, double b1, double a2, double b2, double a3, double b3) {
-      return int_cos_1d(a1, b1) * int_cos_1d(a2, b2) * int_cos_1d(a3, b3);
-    }
-
     auto one = [](const std::vector<double>&) { return 1.0; };
     auto linear_1d = [](const std::vector<double>& x) { return x[0]; };
     auto sin_1d = [](const std::vector<double>& x) { return std::sin(x[0]); };
@@ -135,12 +119,9 @@ namespace vinyaikina_e_multidimensional_integrals_simpson_method {
     auto exp_1d = [](const std::vector<double>& x) { return std::exp(x[0]); };
     auto cos_1d = [](const std::vector<double>& x) { return std::cos(x[0]); };
 
-    auto sin_sin_2d = [](const std::vector<double>& x) { return std::sin(x[0]) * std::sin(x[1]); };
     auto xy_2d = [](const std::vector<double>& x) { return x[0] * x[1]; };
     auto x_plus_y_2d = [](const std::vector<double>& x) { return x[0] + x[1]; };
     auto x2_y_2d = [](const std::vector<double>& x) { return x[0] * x[0] * x[1]; };
-    auto exp_sum_2d = [](const std::vector<double>& x) { return std::exp(x[0] + x[1]); };
-    auto cos_cos_2d = [](const std::vector<double>& x) { return std::cos(x[0]) * std::cos(x[1]); };
 
     auto xyz_3d = [](const std::vector<double>& x) { return x[0] * x[1] * x[2]; };
     auto x2_y2_z2_3d = [](const std::vector<double>& x) {
@@ -148,9 +129,6 @@ namespace vinyaikina_e_multidimensional_integrals_simpson_method {
       };
     auto exp_sum_3d = [](const std::vector<double>& x) {
       return std::exp(x[0] + x[1] + x[2]);
-      };
-    auto cos_cos_cos_3d = [](const std::vector<double>& x) {
-      return std::cos(x[0]) * std::cos(x[1]) * std::cos(x[2]);
       };
 
     const std::array<TestType, 16> kTests = { {

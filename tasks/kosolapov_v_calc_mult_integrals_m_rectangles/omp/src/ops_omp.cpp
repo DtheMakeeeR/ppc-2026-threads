@@ -91,7 +91,7 @@ double KosolapovVCalcMultIntegralsMRectanglesOMP::RectanglesIntegral(int func_id
   double hx = (b - a) / steps;
   double hy = (d - c) / steps;
   double result = 0.0;
-#pragma omp parallel for reduction(+ : result) default(none)
+#pragma omp parallel for reduction(+ : result) default(none) shared(steps, a, hx, c, hy, func_id)
   for (int i = 0; i < steps; i++) {
     double x = a + ((i + 0.5) * hx);
     for (int j = 0; j < steps; j++) {

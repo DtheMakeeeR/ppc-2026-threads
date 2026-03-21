@@ -97,7 +97,8 @@ bool SamoylenkoIIntegralTrapezoidOMP::RunImpl() {
     points *= dim_sizes[i];
   }
 
-#pragma omp parallel default(none) shared(dimensions, points, dim_sizes, h, in, integral_function) reduction(+ : sum) num_threads(ppc::util::GetNumThreads())
+#pragma omp parallel default(none) shared(dimensions, points, dim_sizes, h, in, integral_function) reduction(+ : sum) \
+    num_threads(ppc::util::GetNumThreads())
   {
     std::vector<double> current_point_local(dimensions);
 

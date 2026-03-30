@@ -17,6 +17,7 @@ class ZavyalovAComplSparseMatrMultTBB : public BaseTask {
   bool PreProcessingImpl() override;
   bool RunImpl() override;
   bool PostProcessingImpl() override;
+  static SparseMatrix MultiplicateWithTbb(const SparseMatrix &matr_a, const SparseMatrix &matr_b);
 };
 
 }  // namespace zavyalov_a_compl_sparse_matr_mult 

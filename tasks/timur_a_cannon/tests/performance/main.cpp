@@ -45,6 +45,10 @@ const auto kAllPerfTasks =
                                 TimurACannonMatrixMultiplicationTBB, TimurACannonMatrixMultiplicationSTL>(
         PPC_SETTINGS_timur_a_cannon);
 
+const auto kGtestValues = ppc::util::TupleToGTestValues(kAllPerfTasks);
+
+const auto kPerfTestName = TimurACannonPerfTests::CustomPerfTestName;
+
 INSTANTIATE_TEST_SUITE_P(RunModeTests, TimurACannonPerfTests, kGtestValues, kPerfTestName);
 }  // namespace
 

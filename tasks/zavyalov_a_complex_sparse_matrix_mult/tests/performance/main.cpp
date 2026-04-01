@@ -10,8 +10,9 @@
 #include "zavyalov_a_complex_sparse_matrix_mult/common/include/common.hpp"
 #include "zavyalov_a_complex_sparse_matrix_mult/omp/include/ops_omp.hpp"
 #include "zavyalov_a_complex_sparse_matrix_mult/seq/include/ops_seq.hpp"
+#include "zavyalov_a_complex_sparse_matrix_mult/tbb/include/ops_tbb.hpp"
 
-namespace zavyalov_a_compl_sparse_matr_mult {  // comm for ci12
+namespace zavyalov_a_compl_sparse_matr_mult {
 
 class ZavyalovAComplexSparseMatrMultPerfTest : public ppc::util::BaseRunPerfTests<InType, OutType> {
   static constexpr size_t kCount = 11000;
@@ -83,8 +84,8 @@ TEST_P(ZavyalovAComplexSparseMatrMultPerfTest, RunPerfModes) {
 namespace {
 
 const auto kAllPerfTasks =
-    ppc::util::MakeAllPerfTasks<InType, ZavyalovAComplSparseMatrMultSEQ, ZavyalovAComplSparseMatrMultOMP>(
-        PPC_SETTINGS_zavyalov_a_complex_sparse_matrix_mult);
+    ppc::util::MakeAllPerfTasks<InType, ZavyalovAComplSparseMatrMultSEQ, ZavyalovAComplSparseMatrMultOMP,
+                                ZavyalovAComplSparseMatrMultTBB>(PPC_SETTINGS_zavyalov_a_complex_sparse_matrix_mult);
 
 const auto kGtestValues = ppc::util::TupleToGTestValues(kAllPerfTasks);
 

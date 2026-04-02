@@ -46,7 +46,6 @@ double KiselevITestTaskTBB::ComputeIntegral(const std::vector<int> &steps) {
 
   double hx = (in.right_bounds[0] - in.left_bounds[0]) / steps[0];
   double hy = (in.right_bounds[1] - in.left_bounds[1]) / steps[1];
-  // hello world!!!!!!! 
   using Range2d = tbb::blocked_range2d<int, int>;
 
   double result = tbb::parallel_reduce(Range2d(0, steps[0] + 1, 32, 0, steps[1] + 1, 32), 0.0,

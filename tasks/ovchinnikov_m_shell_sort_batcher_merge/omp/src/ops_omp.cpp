@@ -11,7 +11,7 @@
 namespace ovchinnikov_m_shell_sort_batcher_merge {
 
 namespace {
-
+// nothing
 std::size_t NextPowerOfTwo(std::size_t value) {
   std::size_t power = 1;
   while (power < value) {

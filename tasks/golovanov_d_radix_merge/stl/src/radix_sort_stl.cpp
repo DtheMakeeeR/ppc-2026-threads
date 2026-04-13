@@ -66,8 +66,8 @@ void SortParts(std::vector<double> &arr, const std::vector<std::pair<std::size_t
   }
 }
 
-std::vector<std::vector<double>> CopyParts(
-    const std::vector<double> &arr, const std::vector<std::pair<std::size_t, std::size_t>> &ranges) {
+std::vector<std::vector<double>> CopyParts(const std::vector<double> &arr,
+                                           const std::vector<std::pair<std::size_t, std::size_t>> &ranges) {
   std::vector<std::vector<double>> parts(ranges.size());
 
   for (std::size_t i = 0; i < ranges.size(); ++i) {
@@ -85,7 +85,8 @@ std::vector<std::vector<double>> MergeStep(const std::vector<std::vector<double>
   merge_workers.reserve(pair_count);
 
   for (std::size_t i = 0; i < pair_count; ++i) {
-    merge_workers.emplace_back([&parts, &next, i]() { next[i] = RadixSortSTL::Merge(parts[2 * i], parts[(2 * i) + 1]); });
+    merge_workers.emplace_back(
+        [&parts, &next, i]() { next[i] = RadixSortSTL::Merge(parts[2 * i], parts[(2 * i) + 1]); });
   }
 
   for (auto &thread : merge_workers) {

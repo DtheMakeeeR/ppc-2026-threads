@@ -36,11 +36,8 @@ int GetThreadCount(std::size_t size) {
     num_threads = 1;
   }
 
-  if (static_cast<std::size_t>(num_threads) > size) {
-    num_threads = static_cast<int>(size);
-  }
-
-  return num_threads;
+  const auto max_threads = static_cast<int>(size);
+  return std::min(num_threads, max_threads);
 }
 
 std::vector<std::pair<std::size_t, std::size_t>> BuildRanges(std::size_t size, int num_threads) {
@@ -48,7 +45,7 @@ std::vector<std::pair<std::size_t, std::size_t>> BuildRanges(std::size_t size, i
     num_threads = 1;
   }
 
-  const std::size_t threads_count = static_cast<std::size_t>(num_threads);
+  const auto threads_count = static_cast<std::size_t>(num_threads);
   std::vector<std::pair<std::size_t, std::size_t>> ranges(threads_count);
 
   const std::size_t base = size / threads_count;
@@ -132,7 +129,7 @@ void RadixSortSTL::SortRange(std::vector<double> &arr, std::size_t left, std::si
     std::array<std::size_t, kRadix> count{};
 
     for (std::size_t i = 0; i < n; ++i) {
-      const std::size_t bucket = static_cast<std::size_t>((data[i] >> (byte * 8)) & kByteMask);
+      const auto bucket = static_cast<std::size_t>((data[i] >> (byte * 8)) & kByteMask);
       ++count.at(bucket);
     }
 
@@ -144,7 +141,7 @@ void RadixSortSTL::SortRange(std::vector<double> &arr, std::size_t left, std::si
     }
 
     for (std::size_t i = 0; i < n; ++i) {
-      const std::size_t bucket = static_cast<std::size_t>((data[i] >> (byte * 8)) & kByteMask);
+      const auto bucket = static_cast<std::size_t>((data[i] >> (byte * 8)) & kByteMask);
       const std::size_t pos = count.at(bucket);
       buffer[pos] = data[i];
       ++count.at(bucket);

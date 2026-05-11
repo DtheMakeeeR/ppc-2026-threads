@@ -36,17 +36,19 @@ void RadixSortALL::SortRange(std::vector<double> &arr, std::size_t left, std::si
 
   std::size_t n = right - left;
   std::vector<std::uint64_t> data(n);
-#pragma omp parallel for default(none) shared(data, n) firstprivate(byte)
-  for (std::size_t i = 0; i < n; ++i) {
-    std::uint64_t bits = 0;
-    std::memcpy(&bits, &arr[left + i], sizeof(double));
-    data[i] = ToSortable(bits);
-  }
-
-  std::vector<std::uint64_t> buffer(n);
 
   for (int byte = 0; byte < kBytes; ++byte) {
     std::array<std::size_t, kRadix> count{};
+
+// Преобразование в sortable
+#pragma omp parallel for default(none) shared(data, n, arr, count) firstprivate(byte, left)
+    for (std::size_t i = 0; i < n; ++i) {
+      std::uint64_t bits = 0;
+      std::memcpy(&bits, &arr[left + i], sizeof(double));
+      data[i] = ToSortable(bits);
+    }
+
+    // Счётчик по байтам
     for (std::size_t i = 0; i < n; ++i) {
       auto b = static_cast<std::size_t>((data[i] >> (byte * 8)) & kByteMask);
       ++count.at(b);
@@ -59,6 +61,7 @@ void RadixSortALL::SortRange(std::vector<double> &arr, std::size_t left, std::si
       sum += tmp;
     }
 
+    std::vector<std::uint64_t> buffer(n);
     for (std::size_t i = 0; i < n; ++i) {
       auto b = static_cast<std::size_t>((data[i] >> (byte * 8)) & kByteMask);
       auto pos = count.at(b);
@@ -69,7 +72,8 @@ void RadixSortALL::SortRange(std::vector<double> &arr, std::size_t left, std::si
     data.swap(buffer);
   }
 
-#pragma omp parallel for default(none) shared(data, n) firstprivate(byte)
+// Преобразование обратно в double
+#pragma omp parallel for default(none) shared(data, arr) firstprivate(left, n)
   for (std::size_t i = 0; i < n; ++i) {
     std::uint64_t bits = FromSortable(data[i]);
     std::memcpy(&arr[left + i], &bits, sizeof(double));
@@ -81,6 +85,7 @@ std::vector<double> RadixSortALL::Merge(const std::vector<double> &a, const std:
   result.reserve(a.size() + b.size());
   std::size_t i = 0;
   std::size_t j = 0;
+
   while (i < a.size() && j < b.size()) {
     if (a[i] <= b[j]) {
       result.push_back(a[i++]);
@@ -94,6 +99,7 @@ std::vector<double> RadixSortALL::Merge(const std::vector<double> &a, const std:
   while (j < b.size()) {
     result.push_back(b[j++]);
   }
+
   return result;
 }
 

@@ -12,7 +12,7 @@
 #include <vector>
 
 #include "golovanov_d_radix_merge/common/include/common.hpp"
-#include "ppc/util/include/util.hpp"
+#include "util/include/util.hpp"
 
 namespace {
 

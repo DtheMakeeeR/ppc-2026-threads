@@ -38,7 +38,8 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
       cnt.fill(0);
     }
 
-#pragma omp parallel num_threads(num_threads) default(none) shared(from, local_counts, n, pass, num_threads, k_base)
+#pragma omp parallel num_threads(num_threads) default(none) \
+    shared(from, to, local_counts, thread_offsets, n, pass, num_threads, k_base) private(tid)
     {
       int tid = omp_get_thread_num();
 

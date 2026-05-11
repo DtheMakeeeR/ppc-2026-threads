@@ -27,7 +27,8 @@ bool GolovanovDRadixMergeALL::RunImpl() {
   // ПОДГОТОВКА ПРИКОЛОВ
   const std::size_t n = GetInput().size();
 
-  int mpi_rank, mpi_size;
+  int mpi_rank = 0;
+  int mpi_size = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &mpi_rank);
   MPI_Comm_size(MPI_COMM_WORLD, &mpi_size);
 
@@ -35,7 +36,7 @@ bool GolovanovDRadixMergeALL::RunImpl() {
   std::size_t remainder = n % static_cast<std::size_t>(mpi_size);
 
   std::size_t start = mpi_rank * local_size + std::min<std::size_t>(static_cast<std::size_t>(mpi_rank), remainder);
-  std::size_t end = start + local_size + (static_cast<std::size_t>(mpi_rank) < remainder ? 1 : 0);
+  std::size_t end = start + local_size + (static_cast<std::size_t>(mpi_rank) < remainder ? 1U : 0U);
 
   std::vector<double> local_data(GetInput().begin() + static_cast<std::ptrdiff_t>(start),
                                  GetInput().begin() + static_cast<std::ptrdiff_t>(end));

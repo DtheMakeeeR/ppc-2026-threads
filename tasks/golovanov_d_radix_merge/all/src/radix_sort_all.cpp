@@ -3,6 +3,7 @@
 #include <omp.h>
 
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <vector>
@@ -35,7 +36,7 @@ void RadixSortALL::SortRange(std::vector<double> &arr, std::size_t left, std::si
 
   std::size_t n = right - left;
   std::vector<std::uint64_t> data(n);
-#pragma omp parallel for
+#pragma omp parallel for default(none) shared(data, n) firstprivate(byte)
   for (std::size_t i = 0; i < n; ++i) {
     std::uint64_t bits = 0;
     std::memcpy(&bits, &arr[left + i], sizeof(double));
@@ -68,7 +69,7 @@ void RadixSortALL::SortRange(std::vector<double> &arr, std::size_t left, std::si
     data.swap(buffer);
   }
 
-#pragma omp parallel for
+#pragma omp parallel for default(none) shared(data, n) firstprivate(byte)
   for (std::size_t i = 0; i < n; ++i) {
     std::uint64_t bits = FromSortable(data[i]);
     std::memcpy(&arr[left + i], &bits, sizeof(double));
@@ -78,7 +79,8 @@ void RadixSortALL::SortRange(std::vector<double> &arr, std::size_t left, std::si
 std::vector<double> RadixSortALL::Merge(const std::vector<double> &a, const std::vector<double> &b) {
   std::vector<double> result;
   result.reserve(a.size() + b.size());
-  std::size_t i = 0, j = 0;
+  std::size_t i = 0;
+  std::size_t j = 0;
   while (i < a.size() && j < b.size()) {
     if (a[i] <= b[j]) {
       result.push_back(a[i++]);

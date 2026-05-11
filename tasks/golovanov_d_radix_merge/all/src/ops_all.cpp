@@ -8,11 +8,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <iostream>
-#include <limits>
+#include <utility>
 #include <vector>
 
 #include "golovanov_d_radix_merge/common/include/common.hpp"
+#include "ppc/util/include/util.hpp"
 
 namespace {
 
@@ -21,8 +21,8 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
     return;
   }
 
-  const std::size_t kBase = 256;
-  const std::size_t kPasses = sizeof(std::uint64_t);
+  const std::size_t k_base = 256;
+  const std::size_t k_passes = sizeof(std::uint64_t);
 
   std::vector<double> buffer(data.size());
   std::vector<double> *from = &data;
@@ -30,21 +30,21 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
 
   const std::size_t n = data.size();
 
-  std::vector<std::array<std::size_t, kBase>> local_counts(num_threads);
-  std::vector<std::array<std::size_t, kBase>> thread_offsets(num_threads);
+  std::vector<std::array<std::size_t, k_base>> local_counts(num_threads);
+  std::vector<std::array<std::size_t, k_base>> thread_offsets(num_threads);
 
-  for (std::size_t pass = 0; pass < kPasses; ++pass) {
+  for (std::size_t pass = 0; pass < k_passes; ++pass) {
     for (auto &cnt : local_counts) {
       cnt.fill(0);
     }
 
-#pragma omp parallel num_threads(num_threads)
+#pragma omp parallel num_threads(num_threads) default(none) shared(from, local_counts, n, pass, num_threads, k_base)
     {
       int tid = omp_get_thread_num();
 
 #pragma omp for schedule(static)
-      for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(n); ++i) {
-        std::uint64_t bits;
+      for (std::size_t i = 0; i < n; ++i) {
+        std::uint64_t bits = 0;
         std::memcpy(&bits, &(*from)[i], sizeof(double));
         const std::uint64_t sign_mask = std::uint64_t{1} << 63;
         if (bits & sign_mask) {
@@ -52,31 +52,32 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
         } else {
           bits ^= sign_mask;
         }
-        const auto byte = (bits >> (pass * 8)) & 0xFF;
+        const std::size_t byte = static_cast<std::size_t>((bits >> (pass * 8)) & 0xFF);
         ++local_counts[tid][byte];
       }
 
 #pragma omp single
       {
-        std::array<std::size_t, kBase> total{};
+        std::array<std::size_t, k_base> total{};
         total.fill(0);
-        for (int t = 0; t < num_threads; ++t) {
-          for (std::size_t b = 0; b < kBase; ++b) {
-            total[b] += local_counts[t][b];
+
+        for (int thread_idx = 0; thread_idx < num_threads; ++thread_idx) {
+          for (std::size_t b_idx = 0; b_idx < k_base; ++b_idx) {
+            total[b_idx] += local_counts[thread_idx][b_idx];
           }
         }
 
-        std::array<std::size_t, kBase> offset{};
+        std::array<std::size_t, k_base> offset{};
         std::size_t sum = 0;
-        for (std::size_t b = 0; b < kBase; ++b) {
-          offset[b] = sum;
-          sum += total[b];
+        for (std::size_t b_idx = 0; b_idx < k_base; ++b_idx) {
+          offset[b_idx] = sum;
+          sum += total[b_idx];
         }
 
-        for (int t = 0; t < num_threads; ++t) {
-          thread_offsets[t] = offset;
-          for (std::size_t b = 0; b < kBase; ++b) {
-            offset[b] += local_counts[t][b];
+        for (int thread_idx = 0; thread_idx < num_threads; ++thread_idx) {
+          thread_offsets[thread_idx] = offset;
+          for (std::size_t b_idx = 0; b_idx < k_base; ++b_idx) {
+            offset[b_idx] += local_counts[thread_idx][b_idx];
           }
         }
       }
@@ -84,8 +85,8 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
       auto pos = thread_offsets[tid];
 
 #pragma omp for schedule(static)
-      for (std::ptrdiff_t i = 0; i < static_cast<std::ptrdiff_t>(n); ++i) {
-        std::uint64_t bits;
+      for (std::size_t i = 0; i < n; ++i) {
+        std::uint64_t bits = 0;
         std::memcpy(&bits, &(*from)[i], sizeof(double));
         const std::uint64_t sign_mask = std::uint64_t{1} << 63;
         if (bits & sign_mask) {
@@ -93,7 +94,7 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
         } else {
           bits ^= sign_mask;
         }
-        const auto byte = (bits >> (pass * 8)) & 0xFF;
+        const std::size_t byte = static_cast<std::size_t>((bits >> (pass * 8)) & 0xFF);
         (*to)[pos[byte]++] = (*from)[i];
       }
     }
@@ -114,9 +115,12 @@ void MergeSortedVectors(std::vector<double> &left, const std::vector<double> &ri
     left = right;
     return;
   }
+
   std::vector<double> merged(left.size() + right.size());
+
   std::merge(left.begin(), left.end(), right.begin(), right.end(), merged.begin(), [](double a, double b) {
-    std::uint64_t ka, kb;
+    std::uint64_t ka = 0;
+    std::uint64_t kb = 0;
     std::memcpy(&ka, &a, sizeof(double));
     std::memcpy(&kb, &b, sizeof(double));
     const std::uint64_t mask = std::uint64_t{1} << 63;
@@ -132,6 +136,7 @@ void MergeSortedVectors(std::vector<double> &left, const std::vector<double> &ri
     }
     return ka < kb;
   });
+
   left.swap(merged);
 }
 
@@ -148,6 +153,7 @@ GolovanovDRadixMergeALL::GolovanovDRadixMergeALL(const InType &in) {
 bool GolovanovDRadixMergeALL::ValidationImpl() {
   int rank = 0;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
   int is_valid = 1;
   if (rank == 0) {
     is_valid = !GetInput().empty() ? 1 : 0;
@@ -161,23 +167,28 @@ bool GolovanovDRadixMergeALL::PreProcessingImpl() {
 }
 
 bool GolovanovDRadixMergeALL::RunImpl() {
-  int rank = 0, size = 1;
+  int rank = 0;
+  int size = 1;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
   const int num_threads = ppc::util::GetNumThreads();
 
-  unsigned long long global_size_ull = 0;
+  uint64_t global_size = 0;
   if (rank == 0) {
-    global_size_ull = GetInput().size();
+    global_size = GetInput().size();
   }
-  MPI_Bcast(&global_size_ull, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD);
-  const int global_size = static_cast<int>(global_size_ull);
 
-  std::vector<int> send_counts(size, 0), displs(size, 0);
-  const int base_count = global_size / size;
-  const int remainder = global_size % size;
+  MPI_Bcast(&global_size, 1, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+  const int global_size_int = static_cast<int>(global_size);
+
+  std::vector<int> send_counts(size, 0);
+  std::vector<int> displs(size, 0);
+
+  const int base_count = global_size_int / size;
+  const int remainder = global_size_int % size;
   int offset = 0;
+
   for (int proc = 0; proc < size; ++proc) {
     send_counts[proc] = base_count + (proc < remainder ? 1 : 0);
     displs[proc] = offset;
@@ -216,12 +227,12 @@ bool GolovanovDRadixMergeALL::RunImpl() {
     }
   }
 
-  std::vector<double> result(global_size);
+  std::vector<double> result(global_size_int);
   if (rank == 0) {
     result.swap(local_data);
   }
 
-  MPI_Bcast(result.data(), global_size, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+  MPI_Bcast(result.data(), global_size_int, MPI_DOUBLE, 0, MPI_COMM_WORLD);
   GetOutput() = std::move(result);
 
   return true;

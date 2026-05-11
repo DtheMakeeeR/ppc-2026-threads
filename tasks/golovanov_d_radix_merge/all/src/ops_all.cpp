@@ -10,7 +10,7 @@
 
 #include "../include/radix_sort_all.hpp"
 #include "golovanov_d_radix_merge/common/include/common.hpp"
-#include "ops_all.hpp"
+#include "../include/ops_all.hpp"
 
 namespace golovanov_d_radix_merge {
 

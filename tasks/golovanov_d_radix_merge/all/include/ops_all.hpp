@@ -1,9 +1,5 @@
 #pragma once
 
-#include <algorithm>
-#include <cstddef>
-#include <utility>
-
 #include "golovanov_d_radix_merge/common/include/common.hpp"
 #include "task/include/task.hpp"
 

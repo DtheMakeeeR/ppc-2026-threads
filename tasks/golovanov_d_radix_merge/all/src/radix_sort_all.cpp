@@ -8,8 +8,6 @@
 #include <cstring>
 #include <vector>
 
-#include "../include/ops_all.hpp"
-
 namespace golovanov_d_radix_merge {
 
 namespace {

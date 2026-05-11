@@ -1,7 +1,7 @@
 #pragma once
 
+#include <cstddef>
 #include <vector>
-
 namespace golovanov_d_radix_merge {
 
 class RadixSortALL {

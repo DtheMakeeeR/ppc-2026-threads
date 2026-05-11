@@ -37,6 +37,7 @@ void RadixSortOmp(std::vector<double> &data, int num_threads) {
     for (auto &cnt : local_counts) {
       cnt.fill(0);
     }
+    int tid = 0;
 
 #pragma omp parallel num_threads(num_threads) default(none) \
     shared(from, to, local_counts, thread_offsets, n, pass, num_threads, k_base) private(tid)

@@ -25,8 +25,8 @@ void RadixSortStable(std::vector<double> &data, int /*num_threads*/) {
   if (data.size() < 2) {
     return;
   }
-  std::stable_sort(data.begin(), data.end(),
-                   [](double a, double b) { return DoubleToSortableUint64(a) < DoubleToSortableUint64(b); });
+  std::ranges::stable_sort(data,
+                           [](double a, double b) { return DoubleToSortableUint64(a) < DoubleToSortableUint64(b); });
 }
 
 void MergeSortedVectors(std::vector<double> &left, const std::vector<double> &right) {
@@ -38,8 +38,8 @@ void MergeSortedVectors(std::vector<double> &left, const std::vector<double> &ri
     return;
   }
   std::vector<double> merged(left.size() + right.size());
-  std::merge(left.begin(), left.end(), right.begin(), right.end(), merged.begin(),
-             [](double a, double b) { return DoubleToSortableUint64(a) < DoubleToSortableUint64(b); });
+  std::ranges::merge(left, right, merged.begin(),
+                     [](double a, double b) { return DoubleToSortableUint64(a) < DoubleToSortableUint64(b); });
   left.swap(merged);
 }
 

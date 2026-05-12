@@ -1,5 +1,6 @@
 #include "../include/radix_sort_stl.hpp"
 
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>

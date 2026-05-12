@@ -62,8 +62,7 @@ const auto kTestTasksList = std::tuple_cat(
     ppc::util::AddFuncTask<GolovanovDRadixMergeOMP, InType>(kTestParam, PPC_SETTINGS_golovanov_d_radix_merge),
     ppc::util::AddFuncTask<GolovanovDRadixMergeTBB, InType>(kTestParam, PPC_SETTINGS_golovanov_d_radix_merge),
     ppc::util::AddFuncTask<GolovanovDRadixMergeSTL, InType>(kTestParam, PPC_SETTINGS_golovanov_d_radix_merge),
-    ppc::util::AddFuncTask<GolovanovDRadixMergeALL, InType>(kTestParam, PPC_SETTINGS_golovanov_d_radix_merge)
-  );
+    ppc::util::AddFuncTask<GolovanovDRadixMergeALL, InType>(kTestParam, PPC_SETTINGS_golovanov_d_radix_merge));
 
 const auto kGtestValues = ppc::util::ExpandToValues(kTestTasksList);
 
